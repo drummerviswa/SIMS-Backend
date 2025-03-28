@@ -6,7 +6,10 @@ import path from "path";
 import multer from "multer";
 
 //Importing middlewares
-import { cloudinary } from "./middlewares/cloudinary.js";
+import cloudinary from "./middlewares/cloudinary.js";
+import adminRouter from "./routes/admin/admin.routes.js";
+import departmentRouter from "./routes/department/dept.routes.js";
+import facultyRouter from "./routes/faculty/faculty.routes.js";
 
 //Express app creation
 const app = express();
@@ -22,6 +25,22 @@ app.use(
   })
 );
 app.use(express.json());
+
+//Base URL
+app.get("/", (req, res) => {
+  res.sendFile("index.html", {
+    root: path.join(process.cwd(), "src", "views"),
+  });
+});
+
+//Routes
+
+//Admin routes
+app.use("/admin", adminRouter);
+//Department routes
+app.use("/department", departmentRouter);
+//Faculty routes
+app.use("/faculty",facultyRouter);
 
 //Cloudinary setup
 const storage = multer.diskStorage({

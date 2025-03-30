@@ -1,10 +1,8 @@
-import db from "../../db.js";
+import db from "../../database/db.js";
 
-export const getAllDepartments = async (req, res) => {
+export const getAllDepartments = async (_, res) => {
   try {
-    const [departments] = await db.query("SELECT * FROM department", {
-      type: db.QueryTypes.SELECT,
-    });
+    const [departments] = await db.query("SELECT * FROM department");
     if (departments.length === 0) {
       return res.status(404).json({ message: "No departments found" });
     }
@@ -20,8 +18,7 @@ export const getDepartmentById = async (req, res) => {
   try {
     const [department] = await db.query(
       "SELECT * FROM department WHERE id = ?",
-      [id],
-      { type: db.QueryTypes.SELECT }
+      [id]
     );
     if (!department) {
       return res.status(404).json({ message: "Department not found" });

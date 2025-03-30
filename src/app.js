@@ -40,7 +40,7 @@ app.use("/admin", adminRouter);
 //Department routes
 app.use("/department", departmentRouter);
 //Faculty routes
-app.use("/faculty",facultyRouter);
+app.use("/faculty", facultyRouter);
 
 //Cloudinary setup
 const storage = multer.diskStorage({
@@ -72,8 +72,19 @@ app.post("/upload", upload.single("image"), (req, res) => {
   });
 });
 
+//Check DB Connection
+import { connectionCheck } from "./database/db.js";
+
+connectionCheck()
+  .then((result) => {
+    console.log("Database connection successful:", result);
+  })
+  .catch((err) => {
+    console.error("Database connection failed:", err);
+  });
+
 //App listener
-const port = process.env.PORT || 8800;
+const port = process.env.PORT || 5000;
 app.listen(port, () => {
   console.log(`Api started 🤍 at ${process.env.BASE_URL + ":" + port}`);
 });

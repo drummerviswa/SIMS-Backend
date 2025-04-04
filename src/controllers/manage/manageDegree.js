@@ -1,90 +1,96 @@
+//`degid	degName	department	branch	duration	graduation
 import db from "../../database/db.js";
 
 export const getAllDegrees = async (req, res) => {
   try {
-    const degrees = await db.query("SELECT * FROM degrees");
-    res.status(200).json(degrees.rows);
+    const [rows] = await db.query(
+      "SELECT d.*,dep.* FROM degree AS d JOIN department AS dep ON d.department = dep.deptid"
+    );
+    res.status(200).json(rows);
   } catch (error) {
-    console.error("Error fetching degrees:", error);
-    res.status(500).json({ error: "Internal server error" });
+    res.status(500).json({ error: "Internal Server Error" });
   }
 };
 
 export const getDegreeById = async (req, res) => {
-  const degreeId = req.params.id;
+  const { id } = req.params;
   try {
-    const degree = await db.query("SELECT * FROM degrees WHERE degid = $1", [
-      degreeId,
-    ]);
-    if (degree.rows.length === 0) {
+    const [rows] = await db.query(
+      "SELECT d.*,dep.* FROM degree AS d JOIN department AS dep ON d.department = dep.deptid WHERE d.degid = ?",
+      [id]
+    );
+    if (rows.length === 0) {
       return res.status(404).json({ error: "Degree not found" });
     }
-    res.status(200).json(degree.rows[0]);
+    res.status(200).json(rows[0]);
   } catch (error) {
-    console.error("Error fetching degree:", error);
-    res.status(500).json({ error: "Internal server error" });
+    res.status(500).json({ error: "Internal Server Error" });
   }
 };
 
-//Degree has branch, degid, degName, duration, gradutaion, department, degreeType, degreeCode, degreeLevel, degreeStatus
-export const createDegree = async (req, res) => {
-  const { branch, degid, degName, duration, graduation, department } = req.body;
-
+export const addDegree = async (req, res) => {
+  const { degName, department, branch, duration, graduation } = req.body;
   try {
-    const newDegree = await db.query(
-      "INSERT INTO degrees (branch, degid, degName, duration, graduation, department) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *",
-      [
-        branch,
-        degid,
-        degName,
-        duration,
-        graduation,
-        department,
-        degreeType,
-        degreeCode,
-        degreeLevel,
-        degreeStatus,
-      ]
+    const [result] = await db.query(
+      "INSERT INTO degree (degName, department, duration, graduation) VALUES ( ?, ?, ?, ?)",
+      [degName, department, duration, graduation]
     );
-    res.status(201).json(newDegree.rows[0]);
+    res.status(201).json({ id: result.insertId });
   } catch (error) {
-    console.error("Error creating degree:", error);
-    res.status(500).json({ error: "Internal server error" });
+    res.status(500).json({ error: "Internal Server Error" });
   }
 };
 
 export const updateDegree = async (req, res) => {
-  const degreeId = req.params.id;
-  const { branch, degid, degName, duration, graduation, department } = req.body;
-
+  const { id } = req.params;
+  const { degName, department, duration, graduation } = req.body;
   try {
-    const updatedDegree = await db.query(
-      "UPDATE degrees SET branch = $1, degid = $2, degName = $3, duration = $4, graduation = $5, department = $6 WHERE degid = $7 RETURNING *",
-      [branch, degid, degName, duration, graduation, department, degreeId]
+    const [result] = await db.query(
+      "UPDATE degree SET degName = ?, department = ?,  duration = ?, graduation = ? WHERE degid = ?",
+      [degName, department, duration, graduation, id]
     );
-    if (updatedDegree.rows.length === 0) {
+    if (result.affectedRows === 0) {
       return res.status(404).json({ error: "Degree not found" });
     }
-    res.status(200).json(updatedDegree.rows[0]);
+    res.status(200).json({ message: "Degree updated successfully" });
   } catch (error) {
-    console.error("Error updating degree:", error);
-    res.status(500).json({ error: "Internal server error" });
+    res.status(500).json({ error: "Internal Server Error" });
   }
 };
 
 export const deleteDegree = async (req, res) => {
-  const degreeId = req.params.id;
+  const { id } = req.params;
   try {
-    const deletedDegree = await db.query(
-      "DELETE FROM degrees WHERE degid = $1 RETURNING *",
-      [degreeId]
-    );
-    if (deletedDegree.rows.length === 0) {
+    const [result] = await db.query("DELETE FROM degree WHERE degid = ?", [id]);
+    if (result.affectedRows === 0) {
       return res.status(404).json({ error: "Degree not found" });
     }
-    res.status(200).json(deletedDegree.rows[0]);
+    res.status(200).json({ message: "Degree deleted successfully" });
   } catch (error) {
-    console.error("Error deleting degree:", error);
-    res.status(500).json({ error: "Internal server error" });
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+export const getDegreeByDepartment = async (req, res) => {
+  const { department } = req.params;
+  try {
+    const [rows] = await db.query("SELECT * FROM degree WHERE department = ?", [
+      department,
+    ]);
+    res.status(200).json(rows);
+  } catch (error) {
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+export const getDegreeByDuration = async (req, res) => {
+  const { duration } = req.params;
+  try {
+    const [rows] = await db.query("SELECT * FROM degree WHERE duration = ?", [
+      duration,
+    ]);
+    res.status(200).json(rows);
+  } catch (error) {
+    res.status(500).json({ error: "Internal Server Error" });
   }
 };

@@ -21,7 +21,7 @@ export const getSubjectById = async (req, res) => {
     if (subject.length === 0) {
       return res.status(404).json({ message: "Subject not found" });
     }
-    res.status(200).json(subject);
+    res.status(200).json(subject[0]);
   } catch (error) {
     console.error("Error fetching subject:", error);
     res.status(500).json({ message: "Internal server error" });
@@ -34,7 +34,6 @@ export const createSubject = async (req, res) => {
     credits,
     subCode,
     category,
-    regulation,
     internal,
     lecture,
     practical,
@@ -49,7 +48,6 @@ export const createSubject = async (req, res) => {
       !credits ||
       !subCode ||
       !category ||
-      !regulation ||
       !internal ||
       !lecture ||
       !practical ||
@@ -68,13 +66,12 @@ export const createSubject = async (req, res) => {
       return res.status(400).json({ message: "Subject code already exists" });
     }
     const [newSubject] = await db.query(
-      "INSERT INTO subjects (subName, credits, subCode, category, regulation, internal, lecture, practical, tutorial, totalHours, totalMarks, external) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)",
+      "INSERT INTO subjects (subName, credits, subCode, category, internal, lecture, practical, tutorial, totalHours, totalMarks, external) VALUES (?,?,?,?,?,?,?,?,?,?,?)",
       [
         subName,
         credits,
         subCode,
         category,
-        regulation,
         internal,
         lecture,
         practical,
@@ -101,7 +98,6 @@ export const updateSubject = async (req, res) => {
     credits,
     subCode,
     category,
-    regulation,
     internal,
     lecture,
     practical,
@@ -112,13 +108,12 @@ export const updateSubject = async (req, res) => {
   } = req.body;
   try {
     const [updatedSubject] = await db.query(
-      "UPDATE subjects SET subName = ?, credits = ?, subCode = ?, category = ?, regulation = ?, internal = ?, lecture = ?, practical = ?, tutorial = ?, totalHours = ?,totalMarks = ? ,external = ? WHERE subid = ?",
+      "UPDATE subjects SET subName = ?, credits = ?, subCode = ?, category = ?, internal = ?, lecture = ?, practical = ?, tutorial = ?, totalHours = ?,totalMarks = ? ,external = ? WHERE subid = ?",
       [
         subName,
         credits,
         subCode,
         category,
-        regulation,
         internal,
         lecture,
         practical,

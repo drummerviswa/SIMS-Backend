@@ -11,10 +11,10 @@ import {
 const router = Router();
 
 router.get("/", getAllSubjects);
-router.get("/:id", getSubjectById);
 router.post("/", createSubject);
+router.get("/degree/:degree", getSubjectByDegree);
+router.get("/:subid", getSubjectById);
 router.put("/:id", updateSubject);
 router.delete("/:id", deleteSubject);
-router.get("/degree/:degree", getSubjectByDegree);
 
 export default router;

@@ -10,8 +10,8 @@ import {
 const router = Router();
 
 router.get("/", getAllBranches);
-router.get("/:id", getBranchById);
 router.post("/", createBranch);
+router.get("/:id", getBranchById);
 router.put("/:id", updateBranch);
 router.delete("/:id", deleteBranch);
 

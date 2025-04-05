@@ -30,11 +30,12 @@ export const getStudentById = async (req, res) => {
 };
 
 export const addStudent = async (req, res) => {
+  const departmentId = req.params.departmentId;
   const { regNo, sName, degree, branch, batch } = req.body;
   try {
     const [existingStudent] = await db.query(
-      "SELECT * FROM student WHERE regNo = ?",
-      [regNo]
+      "SELECT * FROM student WHERE regNo = ? AND department = ?",
+      [regNo, departmentId]
     );
     if (existingStudent.length > 0) {
       return res.status(400).json({ error: "Student already exists" });
@@ -120,6 +121,7 @@ export const getStudentsByBranch = async (req, res) => {
     res.status(500).json({ error: "Failed to fetch students" });
   }
 };
+
 export const getStudentsByDepartment = async (req, res) => {
   const departmentId = req.params.departmentId;
   try {

@@ -10,8 +10,8 @@ import {
 const router = Router();
 
 router.get("/", getAllRegulations);
-router.get("/:rid", getRegulationById);
 router.post("/", addRegulation);
+router.get("/:rid", getRegulationById);
 router.put("/:rid", updateRegulation);
 router.delete("/:rid", deleteRegulation);
 

@@ -10,8 +10,8 @@ import {
 const manageDepartmentRoutes = Router();
 
 manageDepartmentRoutes.get("/", getAllDepartments);
-manageDepartmentRoutes.get("/:id", getDepartmentById);
 manageDepartmentRoutes.post("/", createDepartment);
+manageDepartmentRoutes.get("/:id", getDepartmentById);
 manageDepartmentRoutes.put("/:id", updateDepartment);
 manageDepartmentRoutes.delete("/:id", deleteDepartment);
 

@@ -2,6 +2,7 @@ import { Router } from "express";
 import manageBatchRoutes from "./manageBatch.js";
 import manageSubjectRoutes from "./manageSubject.js";
 import manageStudentsByDeptRoutes from "./manageStudentsByDept.js";
+import manageSubjectAssignRoutes from "./manageSubjectAssign.js";
 
 const departmentManage = Router();
 
@@ -11,5 +12,6 @@ departmentManage.get("/", (req, res) => {
 departmentManage.use("/batch", manageBatchRoutes);
 departmentManage.use("/student",manageStudentsByDeptRoutes);
 departmentManage.use("/subject",manageSubjectRoutes);
+departmentManage.use("/subjectAssign", manageSubjectAssignRoutes);
 
 export default departmentManage;

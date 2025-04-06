@@ -14,7 +14,7 @@ router.get("/", getAllSubjects);
 router.post("/", createSubject);
 router.get("/degree/:degree", getSubjectByDegree);
 router.get("/:subid", getSubjectById);
-router.put("/:id", updateSubject);
-router.delete("/:id", deleteSubject);
+router.put("/:subid", updateSubject);
+router.delete("/:subid", deleteSubject);
 
 export default router;

@@ -14,10 +14,9 @@ export const getAllSubjects = async (req, res) => {
 export const getSubjectById = async (req, res) => {
   const { subid } = req.params;
   try {
-    const [subject] = await db.query(
-      "SELECT * FROM subjects WHERE subid = ?",
-      [subid]
-    );
+    const [subject] = await db.query("SELECT * FROM subjects WHERE subid = ?", [
+      subid,
+    ]);
     if (subject.length === 0) {
       return res.status(404).json({ message: "Subject not found" });
     }

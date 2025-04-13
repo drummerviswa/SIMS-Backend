@@ -7,6 +7,8 @@ import manageRegulationRoutes from "./manageRegulation.js";
 import manageBatchRoutes from "./manageBatch.js";
 import manageStudentRoutes from "./manageStudent.js";
 import manageSubjectRoutes from "./manageSubject.js";
+import manageAssessCompRoutes from "./manageAssessComp.js";
+import manageSubjectDepartmentRoutes from "./subject_department.js";
 
 const adminManage = Router();
 
@@ -16,10 +18,12 @@ adminManage.get("/", (req, res) => {
 adminManage.use("/department", manageDepartmentRoutes);
 adminManage.use("/branch", manageBranchRoutes);
 adminManage.use("/degree", manageDegreeRoutes);
+adminManage.use("/assesscomp", manageAssessCompRoutes);
 adminManage.use("/faculty", manageFacultyRoutes);
 adminManage.use("/regulation", manageRegulationRoutes);
 adminManage.use("/batch", manageBatchRoutes);
-adminManage.use("/student",manageStudentRoutes);
-adminManage.use("/subject",manageSubjectRoutes);
+adminManage.use("/student", manageStudentRoutes);
+adminManage.use("/subject", manageSubjectRoutes);
+adminManage.use("/subject_department", manageSubjectDepartmentRoutes);
 
 export default adminManage;

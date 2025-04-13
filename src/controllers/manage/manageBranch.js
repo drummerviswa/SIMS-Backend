@@ -6,7 +6,7 @@ import db from "../../database/db.js";
 export const getAllBranches = async (req, res) => {
   try {
     const [rows] = await db.query(
-      "SELECT b.*,d.degName FROM branch AS b JOIN degree AS d ON b.degree = d.degid"
+      "SELECT b.*,d.degName,r.regName FROM branch AS b JOIN degree AS d ON b.degree = d.degid JOIN regulations AS r ON b.regulation = r.rid"
     );
     res.status(200).json(rows);
   } catch (error) {
@@ -19,7 +19,7 @@ export const getBranchById = async (req, res) => {
   const { id } = req.params;
   try {
     const [rows] = await db.query(
-      "SELECT b.*,d.degName FROM branch AS b JOIN degree AS d ON b.degree = d.degid WHERE bid = ?",
+      "SELECT b.*,d.degName,r.regName FROM branch AS b JOIN degree AS d ON b.degree = d.degid JOIN regulations AS r ON b.regulation = r.rid WHERE bid = ?",
       [id]
     );
     if (rows.length === 0) {
@@ -33,11 +33,11 @@ export const getBranchById = async (req, res) => {
 };
 
 export const createBranch = async (req, res) => {
-  const { branchName, degree, subjects } = req.body;
+  const { branchName, degree, subjects, regulation } = req.body;
   try {
     const [result] = await db.query(
-      "INSERT INTO branch (branchName,degree, subjects) VALUES (?, ?,?)",
-      [branchName, degree, subjects]
+      "INSERT INTO branch (branchName,degree, subjects, regulation) VALUES (?, ?, ?, ?)",
+      [branchName, degree, subjects, regulation]
     );
     res.status(201).json({
       message: "Branch created successfully",
@@ -51,11 +51,11 @@ export const createBranch = async (req, res) => {
 
 export const updateBranch = async (req, res) => {
   const { id } = req.params;
-  const { branchName, subjects } = req.body;
+  const { branchName, subjects, regulation } = req.body;
   try {
     const [result] = await db.query(
-      "UPDATE branch SET branchName = ?, subjects = ? WHERE bid = ?",
-      [branchName, subjects, id]
+      "UPDATE branch SET branchName = ?, subjects = ?, regulation =? WHERE bid = ?",
+      [branchName, subjects, regulation, id]
     );
     if (result.affectedRows === 0) {
       return res.status(404).json({ message: "Branch not found" });

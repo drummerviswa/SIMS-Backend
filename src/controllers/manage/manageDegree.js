@@ -32,8 +32,8 @@ export const addDegree = async (req, res) => {
   const { degName, department, branch, duration, graduation } = req.body;
   try {
     const [result] = await db.query(
-      "INSERT INTO degree (degName, department, duration, graduation) VALUES ( ?, ?, ?, ?)",
-      [degName, department, duration, graduation]
+      "INSERT INTO degree (degName, degSym, department, duration, graduation) VALUES (?, ?, ?, ?, ?)",
+      [degName, degSym, department, duration, graduation]
     );
     res.status(201).json({ id: result.insertId });
   } catch (error) {
@@ -46,8 +46,8 @@ export const updateDegree = async (req, res) => {
   const { degName, department, duration, graduation } = req.body;
   try {
     const [result] = await db.query(
-      "UPDATE degree SET degName = ?, department = ?,  duration = ?, graduation = ? WHERE degid = ?",
-      [degName, department, duration, graduation, id]
+      "UPDATE degree SET degName = ?, department = ?,  duration = ?, graduation = ?, degSym = ? WHERE degid = ?",
+      [degName, department, duration, graduation, degSym, id]
     );
     if (result.affectedRows === 0) {
       return res.status(404).json({ error: "Degree not found" });

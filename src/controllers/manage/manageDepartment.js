@@ -17,7 +17,7 @@ export const getDepartmentById = async (req, res) => {
   const { id } = req.params;
   try {
     const [department] = await db.query(
-      "SELECT * FROM department WHERE id = ?",
+      "SELECT * FROM department WHERE deptid = ?",
       [id]
     );
     if (!department) {

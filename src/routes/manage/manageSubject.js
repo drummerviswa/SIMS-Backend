@@ -5,6 +5,7 @@ import {
   getAllSubjects,
   getSubjectByDegree,
   getSubjectById,
+  getSubjectBySubCode,
   updateSubject,
 } from "../../controllers/manage/manageSubject.js";
 
@@ -16,5 +17,6 @@ router.get("/degree/:degree", getSubjectByDegree);
 router.get("/:subid", getSubjectById);
 router.put("/:subid", updateSubject);
 router.delete("/:subid", deleteSubject);
+router.get("/subCode/:subCode", getSubjectBySubCode);
 
 export default router;

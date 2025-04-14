@@ -76,3 +76,20 @@ export const deleteBatch = async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
+
+export const getBatchByBName = async (req, res) => {
+  const { batchName } = req.params;
+  try {
+    const [batch] = await db.query(
+      "SELECT b.*, r.regName FROM batch AS b JOIN regulations AS r ON b.regulation = r.rid WHERE batchName = ?",
+      [batchName]
+    );
+    if (batch.length === 0) {
+      return res.status(404).json({ error: "Batch not found" });
+    }
+    res.status(200).json(batch[0]);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};

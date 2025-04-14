@@ -3,6 +3,7 @@ import {
   createBatch,
   deleteBatch,
   getAllBatch,
+  getBatchByBName,
   getBatchById,
   updateBatch,
 } from "../../controllers/manage/manageBatch.js";
@@ -14,5 +15,6 @@ router.post("/", createBatch);
 router.get("/:id", getBatchById);
 router.put("/:id", updateBatch);
 router.delete("/:id", deleteBatch);
+router.get("/batchName/:batchName", getBatchByBName);
 
 export default router;

@@ -126,3 +126,23 @@ export const getSubjectAssignById = async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 };
+
+export const getSubjectAssignByFacultySubject = async (req, res) => {
+  const { facultyId, subjectId } = req.params;
+  try {
+    const query = `
+            SELECT sba.*,sub.*,fac.*,bat.*,deg.*,br.* FROM subassign AS sba
+            JOIN subjects AS sub ON sba.subject=sub.subid 
+            JOIN faculty AS fac ON sba.faculty=fac.facid 
+            JOIN batch AS bat ON sba.batch=bat.batchid 
+            JOIN degree AS deg ON sba.degree=deg.degid 
+            JOIN branch AS br ON sba.branch=br.bid 
+            WHERE fac.facid = ? AND sub.subid = ?
+        `;
+    const [rows] = await db.query(query, [facultyId, subjectId]);
+    res.status(200).json(rows[0]);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};

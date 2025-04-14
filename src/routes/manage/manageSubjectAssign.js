@@ -4,6 +4,7 @@ import {
   deleteSubjectAssign,
   getSubjectAssignByDepartment,
   getSubjectAssignByFaculty,
+  getSubjectAssignByFacultySubject,
   getSubjectAssignById,
   updateSubjectAssign,
 } from "../../controllers/manage/manageSubjectAssign.js";
@@ -19,5 +20,9 @@ subjectAssignRouter.post("/:departmentId", createSubjectAssign);
 subjectAssignRouter.put("/:departmentId", updateSubjectAssign);
 subjectAssignRouter.delete("/:departmentId", deleteSubjectAssign);
 subjectAssignRouter.get("/:departmentId/:assignId", getSubjectAssignById);
+subjectAssignRouter.get(
+  "/facSub/:facultyId/:subjectId",
+  getSubjectAssignByFacultySubject
+);
 
 export default subjectAssignRouter;

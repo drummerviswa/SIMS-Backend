@@ -1,5 +1,6 @@
 import { Router } from "express";
 import {
+  getStudentsEntireMarks,
   getStudentsForMarks,
   grantMarks,
   updateMarks,
@@ -19,5 +20,10 @@ marksRouter.post(
 marksRouter.put(
   "/:faculty/:subject/:tenure/:batch/:degree/:branch/:msid/update",
   updateMarks
+);
+
+marksRouter.get(
+  "/:facid/:subCode/:degree/:branch",
+  getStudentsEntireMarks
 );
 export default marksRouter;

@@ -69,6 +69,70 @@ export const getStudentsForMarks = async (req, res) => {
   }
 };
 
+export const getStudentsEntireMarks = async (req, res) => {
+  const { facid, subCode, degree, branch } = req.params;
+  try {
+    const [students] = await db.query(
+      `SELECT
+    stud.regNo,
+    stud.sName,
+    JSON_ARRAYAGG(
+        JSON_OBJECT(
+            'msid', m.msid,
+            'criteriaName', c.criteriaName,
+            'mainWeightage', m.mainWeightage,
+            'subSplitups', IFNULL(subsubs.subSplitups, JSON_ARRAY())
+        )
+    ) AS mainSplitups
+FROM
+    subassign AS sba
+JOIN student AS stud
+    ON sba.degree = stud.degree AND sba.branch = stud.branch AND sba.batch = stud.batch
+JOIN mainsplitup AS m
+    ON m.faculty = sba.faculty AND m.subject = sba.subject
+JOIN subjects AS sub
+    ON sub.subid = m.subject
+JOIN criteria AS c
+    ON m.criteria = c.cid
+LEFT JOIN (
+    SELECT
+        s.mainsplitup,
+        mk.studentRegno,
+        JSON_ARRAYAGG(
+            JSON_OBJECT(
+                'subSplitupId', s.subsplitid,
+                'subCriteria', s.subCriteria,
+                'subWeightage', s.subWeightage,
+                'enteredMark', IFNULL(mk.mark, NULL),
+                'isLocked', IF(mk.mark IS NOT NULL, TRUE, FALSE)
+            )
+        ) AS subSplitups
+    FROM
+        subsplitup AS s
+    LEFT JOIN marks AS mk
+        ON mk.subCriteria = s.subsplitid
+    GROUP BY
+        s.mainsplitup, mk.studentRegno
+) AS subsubs
+    ON subsubs.mainsplitup = m.msid AND subsubs.studentRegno = stud.regNo
+WHERE
+    m.faculty = 1 AND sub.subCode = 'XC5251' AND sba.degree = 4 AND sba.branch = 4
+GROUP BY
+    stud.regNo
+ORDER BY
+    stud.regNo;
+
+        `,
+      [facid, subCode, degree, branch]
+    );
+
+    res.status(200).json(students);
+  } catch (error) {
+    console.error("Error fetching students:", error);
+    res.status(500).json({ error: "Failed to fetch students" });
+  }
+};
+
 export const grantMarks = async (req, res) => {
   const students = req.body;
 

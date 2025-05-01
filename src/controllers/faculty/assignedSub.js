@@ -45,7 +45,7 @@ export const getAssignedSubById = async (req, res) => {
             LEFT JOIN batch AS ba ON sba.batch = ba.batchid
             LEFT JOIN assesscomp AS ac ON ac.acid = s.component
             LEFT JOIN regulations AS r ON r.rid = ac.regulation
-            WHERE ac.acid = ?
+            WHERE s.subid = ?
             `;
 
     const [rows] = await db.query(query, [subid]);

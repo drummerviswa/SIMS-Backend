@@ -4,6 +4,7 @@ import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
 import path from "path";
 import multer from "multer";
+import bodyParser from "body-parser";
 
 //Importing middlewares
 import cloudinary from "./middlewares/cloudinary.js";
@@ -15,7 +16,8 @@ import facultyRouter from "./routes/faculty/faculty.routes.js";
 const app = express();
 
 //Middlewares
-app.use(express.urlencoded({ extended: false }));
+app.use(bodyParser.json({ limit: "10mb" }));
+app.use(bodyParser.urlencoded({ limit: "10mb", extended: true }));
 dotenv.config();
 app.use(cookieParser());
 app.use(
@@ -52,7 +54,10 @@ const storage = multer.diskStorage({
   },
 });
 
-const upload = multer({ storage: storage });
+const upload = multer({
+  storage: storage,
+  limits: "10mb",
+}); // 10 MB limit
 
 // Define a POST route for uploading an image
 app.post("/upload", upload.single("image"), (req, res) => {

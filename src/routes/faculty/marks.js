@@ -23,7 +23,7 @@ marksRouter.put(
 );
 
 marksRouter.get(
-  "/:facid/:subCode/:degree/:branch",
+  "/:faculty/:subject/:tenure/:batch/:degree/:branch/:msid/entire",
   getStudentsEntireMarks
 );
 export default marksRouter;

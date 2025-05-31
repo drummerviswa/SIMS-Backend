@@ -7,6 +7,8 @@ import facultyCriteria from "./criteria.js";
 import facultyMainSplitup from "./mainSplitup.js";
 import facultySubSplitup from "./subSplitup.js";
 import facultyMarks from "./marks.js";
+import assignmentSplitupRouter from "./assignmentSplitup.js";
+import assignmentSubSubSplitupRouter from "./assignmentSubSplitup.js";
 
 const facultyRouter = express.Router();
 
@@ -18,5 +20,7 @@ facultyRouter.use("/assignedSub", facultySubAssigned);
 facultyRouter.use("/mainSplitup", facultyMainSplitup);
 facultyRouter.use("/subSplitup", facultySubSplitup);
 facultyRouter.use("/marks", facultyMarks);
+facultyRouter.use("/assignmentSplitup", assignmentSplitupRouter);
+facultyRouter.use("/assignmentSubSplitup", assignmentSubSubSplitupRouter);
 
 export default facultyRouter;

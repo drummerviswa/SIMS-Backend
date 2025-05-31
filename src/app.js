@@ -7,7 +7,6 @@ import multer from "multer";
 import bodyParser from "body-parser";
 
 //Importing middlewares
-import cloudinary from "./middlewares/cloudinary.js";
 import adminRouter from "./routes/admin/admin.routes.js";
 import departmentRouter from "./routes/department/dept.routes.js";
 import facultyRouter from "./routes/faculty/faculty.routes.js";
@@ -35,31 +34,10 @@ app.get("/", (req, res) => {
   });
 });
 
+import { upload } from "./utils/imageUpload.js";
+import cloudinary from "./middlewares/cloudinary.js";
+
 //Routes
-
-//Admin routes
-app.use("/admin", adminRouter);
-//Department routes
-app.use("/department", departmentRouter);
-//Faculty routes
-app.use("/faculty", facultyRouter);
-
-//Cloudinary setup
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, "uploads/");
-  },
-  filename: (req, file, cb) => {
-    cb(null, Date.now() + path.extname(file.originalname));
-  },
-});
-
-const upload = multer({
-  storage: storage,
-  limits: "10mb",
-}); // 10 MB limit
-
-// Define a POST route for uploading an image
 app.post("/upload", upload.single("image"), (req, res) => {
   if (!req.file) {
     return res.status(400).json({ error: "No file uploaded" });
@@ -76,6 +54,12 @@ app.post("/upload", upload.single("image"), (req, res) => {
     res.json({ imageUrl: result.secure_url });
   });
 });
+//Admin routes
+app.use("/admin", adminRouter);
+//Department routes
+app.use("/department", departmentRouter);
+//Faculty routes
+app.use("/faculty", facultyRouter);
 
 //Check DB Connection
 import { connectionCheck } from "./database/db.js";

@@ -79,3 +79,29 @@ export const facultyLogout = (req, res) => {
   res.clearCookie("token");
   res.status(200).json({ message: "Logout successful" });
 };
+
+export const getFacultyProfile = async (req, res) => {
+  try {
+    const token = req.cookies.token;
+    if (!token) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const facultyId = req.params.facid || decoded.id;
+
+    const [results] = await db.query(
+      "SELECT facid, facName, username, primaryDept, designation FROM faculty WHERE facid = ?",
+      [facultyId]
+    );
+
+    if (results.length === 0) {
+      return res.status(404).json({ message: "Faculty not found" });
+    }
+
+    res.status(200).json(results[0]);
+  } catch (error) {
+    console.error("Error fetching faculty profile:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};

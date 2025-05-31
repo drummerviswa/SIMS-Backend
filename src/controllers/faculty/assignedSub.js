@@ -5,7 +5,7 @@ export const getAssignedSub = async (req, res) => {
 
   try {
     const query = `
-        SELECT sba.*, s.*, f.*, d.*, b.*, deg.*, ac.*,ba.* FROM subassign AS sba 
+        SELECT sba.*, s.*, f.*, d.*, b.*, deg.*, ac.*,ba.*, r.* FROM subassign AS sba 
         LEFT JOIN subjects AS s ON sba.subject = s.subid 
         LEFT JOIN faculty AS f ON sba.faculty = f.facid 
         LEFT JOIN department AS d ON f.primaryDept = d.deptid 
@@ -13,6 +13,7 @@ export const getAssignedSub = async (req, res) => {
         LEFT JOIN degree AS deg ON deg.degid = b.degree 
         LEFT JOIN batch AS ba ON sba.batch = ba.batchid
         LEFT JOIN assesscomp AS ac ON ac.acid = s.component
+        LEFT JOIN regulations AS r ON r.rid = ac.regulation
         WHERE sba.faculty = ?
         `;
 

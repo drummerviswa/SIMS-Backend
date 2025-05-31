@@ -34,8 +34,8 @@ export const addStudent = async (req, res) => {
   const { regNo, sName, degree, branch, batch } = req.body;
   try {
     const [existingStudent] = await db.query(
-      "SELECT * FROM student WHERE regNo = ? AND department = ?",
-      [regNo, departmentId]
+      "SELECT * FROM student WHERE regNo = ?",
+      [regNo]
     );
     if (existingStudent.length > 0) {
       return res.status(400).json({ error: "Student already exists" });

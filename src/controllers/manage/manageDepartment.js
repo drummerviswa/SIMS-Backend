@@ -61,7 +61,7 @@ export const updateDepartment = async (req, res) => {
         .json({ message: "deptName, username and password are required" });
     }
     const [updatedDepartment] = await db.query(
-      "UPDATE department SET deptName = ?, username = ?, password = ? WHERE id = ?",
+      "UPDATE department SET deptName = ?, username = ?, password = ? WHERE deptid = ?",
       [deptName, username, password, id]
     );
     if (updatedDepartment.affectedRows === 0) {
@@ -78,7 +78,7 @@ export const deleteDepartment = async (req, res) => {
   const { id } = req.params;
   try {
     const [deletedDepartment] = await db.query(
-      "DELETE FROM department WHERE id = ?",
+      "DELETE FROM department WHERE deptid = ?",
       [id]
     );
     if (deletedDepartment.affectedRows === 0) {

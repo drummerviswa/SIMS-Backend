@@ -48,7 +48,7 @@ export const createAssessComp = async (req, res) => {
   } = req.body;
   try {
     const [result] = await db.query(
-      "INSERT INTO assesscomp (l, t, p, c, assess1, assess2, endsem, cperiod, type, regulation,written,assignment) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+      "INSERT INTO assesscomp (l, t, p, c, assess1, assess2, endsem, cperiod, type, regulation,written,assignment) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?)",
       [
         l,
         t,

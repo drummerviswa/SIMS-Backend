@@ -110,12 +110,32 @@ export const getSubjectBySubCode = async (req, res) => {
   const { subCode } = req.params;
   try {
     const [subjects] = await db.query(
-      "SELECT * FROM subjects WHERE subCode = ?",
+      "SELECT s.*,r.regName FROM subjects AS s JOIN assesscomp AS ac ON ac.acid = s.component JOIN regulations r ON ac.regulation=r.rid WHERE subCode = ?",
       [subCode]
     );
     res.status(200).json(subjects[0]);
   } catch (error) {
     console.error("Error fetching subjects:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const getRegulationBySubBatch = async (req, res) => {
+  const { subCode, batchName } = req.params;
+  try {
+    const [regulation] = await db.query(
+      `SELECT r.* FROM assesscomp AS ac 
+      JOIN subjects AS s ON s.component = ac.acid
+      JOIN subassign AS sa ON sa.subject = s.subid
+      JOIN batch AS b ON sa.batch = b.batchid
+      JOIN regulations AS r ON r.rid = ac.regulation
+      WHERE s.subCode = ? AND b.batchName = ?
+      `,
+      [subCode, batchName]
+    );
+    res.status(200).json(regulation[0]);
+  } catch (error) {
+    console.error("Error fetching regulation:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 };

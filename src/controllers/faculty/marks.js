@@ -70,6 +70,76 @@ ORDER BY
     res.status(500).json({ error: "Failed to fetch students" });
   }
 };
+export const getStudentsForMarksOther = async (req, res) => {
+  const { faculty, subject, tenure, batch, branch, degree, msid } = req.params;
+
+  try {
+    const [students] = await db.query(
+      `SELECT 
+  stud.regNo, 
+  stud.sName, 
+  m.asid AS mainsplitup_msid, 
+  c.criteriaName AS criteriaName, 
+  m.mainWeightage, 
+  m.writtenTest, 
+  COALESCE(mk.mainCriteria, m.criteria) AS mainCriteria,
+  COALESCE(mk.tenure, m.tenure) AS tenure,
+  COALESCE(mk.subject, m.subject) AS subject,
+  JSON_ARRAYAGG(
+    JSON_OBJECT(
+      'subSplitupId', s.assignsubid,
+      'subCriteria', s.subCriteria,
+      'subWeightage', s.subWeightage,
+      'enteredMark', IFNULL(mk.mark, NULL),
+      'isLocked', IF(mk.mark IS NOT NULL, true, false)
+    )
+  ) AS SubCriteriaBreakdown 
+FROM subassign AS sba 
+JOIN faculty AS f ON f.facid = sba.faculty 
+JOIN subjects AS sub ON sub.subid = sba.subject 
+JOIN student AS stud ON sba.degree = stud.degree 
+                  AND sba.branch = stud.branch 
+                  AND sba.batch = stud.batch 
+JOIN assignmentsplitup AS m ON m.faculty = sba.faculty 
+                    AND m.subject = sba.subject 
+                    AND m.tenure = ? 
+                    AND m.asid = ? 
+LEFT JOIN assignmentsubsplitup AS s ON s.mainsplitup = m.asid 
+JOIN criteria AS c ON m.criteria = c.cid 
+JOIN assesscomp AS ac ON ac.acid = sub.component 
+LEFT JOIN marks AS mk 
+  ON mk.studentRegno = stud.regNo 
+ AND mk.subject = m.subject 
+ AND mk.subCriteria = s.assignsubid
+ AND mk.tenure = ?
+
+GROUP BY 
+  stud.regNo, stud.sName, m.asid, c.criteriaName, m.mainWeightage, mainCriteria, tenure, subject
+ORDER BY 
+  stud.regNo;
+
+        `,
+      [
+        tenure, // for m.tenure
+        msid, // for m.msid
+        tenure, // for mk.tenure
+        faculty, // for m.faculty
+        subject, // for m.subject
+        batch, // for sba.batch
+        degree, // for stud.degree
+        branch, // for stud.branch
+      ]
+    );
+    console.log(students.map((student) => student.SubCriteriaBreakdown));
+    if (students.length === 0) {
+      return res.status(404).json({ message: "No students found" });
+    }
+    res.status(200).json(students);
+  } catch (error) {
+    console.error("Error fetching students:", error);
+    res.status(500).json({ error: "Failed to fetch students" });
+  }
+};
 
 export const getStudentsEntireMarks = async (req, res) => {
   const { faculty, subject, tenure, degree, branch, batch, msid } = req.params;
@@ -257,5 +327,74 @@ export const updateMarks = async (req, res) => {
   } catch (error) {
     console.error("Error updating marks:", error);
     res.status(500).json({ message: "Failed to update marks." });
+  }
+};
+
+export const getStudentsMarksByAssessment = async (req, res) => {
+  const { faculty, subject, tenure, degree, branch, batch, msid } = req.params;
+  try {
+    const [students] = await db.query(
+      `SELECT
+  stud.regNo,
+  stud.sName,
+  m.msid,
+  c.criteriaName AS criteriaName,
+  m.mainWeightage,
+  m.writtenTest,
+  JSON_ARRAYAGG(
+    JSON_OBJECT(
+      'subSplitupId', s.subsplitid,
+      'subCriteria', s.subCriteria,
+      'subWeightage', s.subWeightage,
+      'enteredMark', mk.mark,
+      'isLocked', IF(mk.mark IS NOT NULL, true, false)
+    )
+  ) AS SubCriteriaBreakdown
+FROM
+  subassign AS sba
+JOIN faculty AS f ON f.facid = sba.faculty
+JOIN subjects AS sub ON sub.subid = sba.subject
+JOIN student AS stud ON sba.degree = stud.degree 
+                      AND sba.branch = stud.branch 
+                      AND sba.batch = stud.batch
+JOIN mainsplitup AS m ON m.faculty = sba.faculty 
+                       AND m.subject = sba.subject 
+                       AND m.tenure = ? 
+                       AND m.msid = ?
+LEFT JOIN subsplitup AS s ON s.mainsplitup = m.msid
+JOIN criteria AS c ON m.criteria = c.cid  -- Correctly join criteria table
+JOIN assesscomp AS ac ON ac.acid = sub.component
+LEFT JOIN marks AS mk ON mk.studentRegno = stud.regNo 
+                       AND mk.subject = m.subject
+                       AND mk.mainCriteria = m.criteria
+                       AND mk.subCriteria = s.subsplitid
+                       AND mk.tenure = ?
+WHERE
+  m.faculty = ? 
+  AND m.subject = ? 
+  AND sba.batch = ? 
+  AND stud.degree = ? 
+  AND stud.branch = ?
+GROUP BY
+  stud.regNo, stud.sName, m.msid, c.criteriaName, m.mainWeightage
+ORDER BY
+  stud.regNo;
+        `,
+      [
+        tenure, // for m.tenure
+        msid, // for m.msid
+        tenure, // for mk.tenure
+        faculty, // for m.faculty
+        subject, // for m.subject
+        batch, // for sba.batch
+        degree, // for stud.degree
+        branch, // for stud.branch
+      ]
+    );
+
+    res.status(200).json(students);
+  } catch (error) {
+    console.error("Error fetching students:", error);
+    res.status(500).json({ error: "Failed to fetch students" });
   }
 };

@@ -1,6 +1,7 @@
 import db from "../../database/db.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
+import fs from "fs";
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -9,6 +10,7 @@ cloudinary.config({
 });
 
 // Middleware to verify the JWT and attach the user to the request object
+
 export const verifyToken = (req, res, next) => {
   const authHeader = req.headers.authorization;
 
@@ -17,15 +19,19 @@ export const verifyToken = (req, res, next) => {
   }
 
   const token = authHeader.split(" ")[1];
+
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decoded;
+    req.user = decoded; // Save decoded payload (e.g., user ID) for next middleware
     next();
   } catch (err) {
-    console.log("JWT verification error:", err.name, err.message);
-    return res.status(403).json({ message: "Token is invalid or expired" });
+    console.error("JWT verification error:", err.name, err.message);
+    if (err.name === "TokenExpiredError") {
+      return res.status(401).json({ message: "Token has expired" });
+    } else {
+      return res.status(403).json({ message: "Token is invalid" });
+    }
   }
-  
 };
 
 // Get Admin Profile
@@ -48,10 +54,10 @@ export const getAdminProfile = async (req, res) => {
 export const updateEmail = async (req, res) => {
   const { email } = req.body;
   try {
-    const [result] = await db.query("UPDATE admin SET email = ? WHERE aid = ?", [
-      email,
-      req.user.id,
-    ]);
+    const [result] = await db.query(
+      "UPDATE admin SET email = ? WHERE aid = ?",
+      [email, req.user.id]
+    );
     if (result.affectedRows === 0) {
       return res.status(404).json({ message: "Admin not found" });
     }
@@ -81,24 +87,35 @@ export const resetPassword = async (req, res) => {
 
 // Update Profile Picture
 export const updateProfilePic = async (req, res) => {
-  const { imageUrl } = req.body;
   try {
-    // Upload the image to Cloudinary
-    const result = await cloudinary.uploader.upload(imageUrl, {
+    // Ensure a file is present
+    if (!req.file) {
+      return res.status(400).json({ message: "No file uploaded" });
+    }
+
+    // Upload file to Cloudinary
+    const result = await cloudinary.uploader.upload(req.file.path, {
       folder: "admin_profiles",
     });
+
+    // Clean up local file
+    fs.unlinkSync(req.file.path);
+
     const [updateResult] = await db.query(
       "UPDATE admin SET profile_pic = ? WHERE aid = ?",
       [result.secure_url, req.user.id]
     );
+
     if (updateResult.affectedRows === 0) {
       return res.status(404).json({ message: "Admin not found" });
     }
+
     res.json({
       message: "Profile picture updated successfully",
       imageUrl: result.secure_url,
     });
   } catch (error) {
+    console.error("Image upload error:", error);
     res.status(500).json({ message: "Error updating profile picture" });
   }
 };
@@ -341,9 +358,10 @@ export const changePassword = async (req, res) => {
   const { oldPassword, newPassword } = req.body;
 
   try {
-    const [adminResult] = await db.query("SELECT * FROM admin WHERE email = ?", [
-      req.body.email,
-    ]);    
+    const [adminResult] = await db.query(
+      "SELECT * FROM admin WHERE email = ?",
+      [req.body.email]
+    );
     if (adminResult.length === 0) {
       return res.status(404).json({ message: "Admin not found" });
     }

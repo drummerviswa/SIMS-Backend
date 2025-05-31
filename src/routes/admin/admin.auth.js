@@ -13,6 +13,7 @@ import {
   updateProfilePic,
   verifyToken,
 } from "../../controllers/admin/admin.auth.js";
+import { upload } from "../../utils/imageUpload.js";
 
 const router = express.Router();
 
@@ -24,10 +25,15 @@ router.post("/login", adminLogin);
 router.post("/logout", adminLogout);
 router.get("/profile", verifyToken, getAdminProfile);
 
-router.get("/profile", verifyToken, getAdminProfile);
+router.get("/profile/:aid", verifyToken, getAdminProfile);
 router.put("/update-name", verifyToken, updateName);
 router.put("/update-email", verifyToken, updateEmail);
-router.put("/update-profile-pic", verifyToken, updateProfilePic);
+router.put(
+  "/update-profile-pic",
+  verifyToken,
+  upload.single("imageUrl"),
+  updateProfilePic
+);
 router.put("/reset-password", verifyToken, resetPassword);
 router.put("/change-password", verifyToken, changePassword);
 

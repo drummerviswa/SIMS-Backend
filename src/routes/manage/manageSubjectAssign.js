@@ -17,8 +17,8 @@ subjectAssignRouter.get(
   getSubjectAssignByFaculty
 );
 subjectAssignRouter.post("/:departmentId", createSubjectAssign);
-subjectAssignRouter.put("/:departmentId", updateSubjectAssign);
-subjectAssignRouter.delete("/:departmentId", deleteSubjectAssign);
+subjectAssignRouter.put("/:departmentId/:assignId", updateSubjectAssign);
+subjectAssignRouter.delete("/:departmentId/:assignId", deleteSubjectAssign);
 subjectAssignRouter.get("/:departmentId/:assignId", getSubjectAssignById);
 subjectAssignRouter.get(
   "/facSub/:facultyId/:subjectId",

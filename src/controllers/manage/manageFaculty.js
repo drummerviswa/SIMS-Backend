@@ -14,6 +14,25 @@ export const getAllFaculty = async (req, res) => {
   }
 };
 
+export const getAllFacultyByDepartment = async (req, res) => {
+  const { department } = req.params;
+  try {
+    const [rows] = await db.query(
+      "SELECT f.*,d.* FROM faculty AS f JOIN department AS d ON f.primaryDept = d.deptid WHERE d.deptid = ?",
+      [department]
+    );
+    if (rows.length === 0) {
+      return res
+        .status(404)
+        .json({ message: "No faculty found for this department" });
+    }
+    res.status(200).json(rows);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 export const getFacultyById = async (req, res) => {
   const { id } = req.params;
   try {

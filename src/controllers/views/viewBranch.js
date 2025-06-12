@@ -4,7 +4,7 @@ export const viewBranchByDepartment = async (req, res) => {
   const { departmentId } = req.params;
   try {
     const [rows] = await db.query(
-      `SELECT b.*,d.degName,d.degSym FROM branch AS b JOIN degree AS d ON b.degree = d.degid JOIN department dep ON d.department = dep.deptid WHERE d.department = ?`,
+      `SELECT b.*,d.*,r.* FROM branch AS b JOIN degree AS d ON b.degree = d.degid JOIN department dep ON d.department = dep.deptid JOIN regulations AS r ON b.regulation = r.rid  WHERE d.department = ?`,
       [departmentId]
     );
     console.log("Getting branches for departmentId:", departmentId);

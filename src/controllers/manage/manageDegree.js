@@ -29,7 +29,7 @@ export const getDegreeById = async (req, res) => {
 };
 
 export const addDegree = async (req, res) => {
-  const { degName, department, branch, duration, graduation } = req.body;
+  const { degName, department, duration, graduation, degSym } = req.body;
   try {
     const [result] = await db.query(
       "INSERT INTO degree (degName, degSym, department, duration, graduation) VALUES (?, ?, ?, ?, ?)",
@@ -37,7 +37,7 @@ export const addDegree = async (req, res) => {
     );
     res.status(201).json({ id: result.insertId });
   } catch (error) {
-    res.status(500).json({ error: "Internal Server Error" });
+    res.status(500).json({ error: "Internal Server Error!!" });
   }
 };
 

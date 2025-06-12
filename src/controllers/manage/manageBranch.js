@@ -6,7 +6,7 @@ import db from "../../database/db.js";
 export const getAllBranches = async (req, res) => {
   try {
     const [rows] = await db.query(
-      "SELECT b.*,d.degName,r.regName FROM branch AS b JOIN degree AS d ON b.degree = d.degid JOIN regulations AS r ON b.regulation = r.rid"
+      "SELECT b.*,d.*,r.* FROM branch AS b JOIN degree AS d ON b.degree = d.degid JOIN regulations AS r ON b.regulation = r.rid"
     );
     res.status(200).json(rows);
   } catch (error) {
@@ -84,9 +84,10 @@ export const deleteBranch = async (req, res) => {
 export const getBranchByDepartment = async (req, res) => {
   const { department } = req.params;
   try {
-    const [rows] = await db.query("SELECT * FROM branch WHERE department = ?", [
-      department,
-    ]);
+    const [rows] = await db.query(
+      "SELECT b.*,r.*,d.* FROM branch AS b JOIN degree AS d ON d.degid = b.degree JOIN regulations AS r ON b.regulation = r.rid WHERE department = ?",
+      [department]
+    );
     res.status(200).json(rows);
   } catch (error) {
     console.error(error);

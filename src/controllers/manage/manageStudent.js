@@ -39,7 +39,18 @@ export const addStudent = async (req, res) => {
     if (existingStudent.length > 0) {
       return res.status(400).json({ error: "Student already exists" });
     }
+    const [[degreeDetails]] = await db.query(
+      "SELECT * FROM degree WHERE degid = ?",
+      [degree]
+    );
+    const [[branchDetails]] = await db.query(
+      "SELECT * FROM branch WHERE bid = ?",
+      [branch]
+    );
 
+    if (degreeDetails.degid !== branchDetails.degree) {
+      return res.status(400).json({ error: "Degree not matched" });
+    }
     const [result] = await db.query(
       "INSERT INTO student (regNo, sName, degree, branch, batch) VALUES (?, ?, ?, ?, ?)",
       [regNo, sName, degree, branch, batch]

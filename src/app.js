@@ -18,7 +18,6 @@ import adminRouter from "./routes/admin/admin.routes.js";
 import departmentRouter from "./routes/department/dept.routes.js";
 import facultyRouter from "./routes/faculty/faculty.routes.js";
 import reportRouter from "./routes/report.routes.js";
-import pdfReportRouter from "./routes/pdf.routes.js";
 
 
 dotenv.config();
@@ -90,8 +89,7 @@ app.get("/backup", async (req, res) => {
 app.use("/admin", adminRouter);
 app.use("/department", departmentRouter);
 app.use("/faculty", facultyRouter);
-app.use("/report", reportRouter);
-app.use("/report/pdf", pdfReportRouter);
+app.use("/reports", reportRouter);
 
 // DB CONNECTION
 connectionCheck()
